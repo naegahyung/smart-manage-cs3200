@@ -69,3 +69,11 @@
   padding-right: 30px;
   padding-top: 50px;
 }
+
+.property-info-container {
+  padding-bottom: 100px;
+}
+
+.info-section {
+  padding-left: 30px !important;
+}

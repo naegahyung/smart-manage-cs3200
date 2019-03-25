@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Button, Input, List, Form, Checkbox } from 'semantic-ui-react'
+import { Card, Button, Input, List, Form, Checkbox, Feed, Icon } from 'semantic-ui-react'
 import moment from 'moment'
 
 export default function Home() {
@@ -10,11 +10,12 @@ export default function Home() {
           <Portfolio />
         </div>
       </div>
-      <div className="grid-task-list-container border">
-        <div className="to-do border">
+      <div className="grid-task-list-container">
+        <div className="to-do">
           <ToDoList />
         </div>
-        <div className="last-updated-list">
+        <div className="last-updated-list"> 
+          <Update />
         </div>
       </div>
     </div>
@@ -192,4 +193,43 @@ function Task({ data, deleteTask }) {
       {content}
     </List>
   ) 
+}
+
+function Update() {
+  const [feeds, setFeeds] = useState([])
+
+  useEffect(() => {
+    setFeeds(generateDumbData(10))
+  }, [])
+
+  const formattedFeed = feeds.map(feed => {
+    return (
+      <Feed.Event>
+        <Feed.Label>
+          <img src='https://react.semantic-ui.com/images/avatar/small/elliot.jpg' />
+        </Feed.Label>
+        <Feed.Content>
+          <Feed.Summary>
+            <Feed.User>Elliot Fu</Feed.User> added you as a friend
+            <Feed.Date>1 Hour Ago</Feed.Date>
+          </Feed.Summary>
+          <Feed.Meta>
+            <Feed.Like>
+              <Icon name='like' />
+              4 Likes
+            </Feed.Like>
+          </Feed.Meta>
+        </Feed.Content>
+      </Feed.Event>
+    )
+  })
+
+  return (
+    <div>
+      <h1>Recently Updated</h1>
+      <Feed>
+        {formattedFeed}
+      </Feed>
+    </div>
+  )
 }

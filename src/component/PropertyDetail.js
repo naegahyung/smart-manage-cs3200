@@ -1,15 +1,23 @@
 import React from 'react'
-import { List } from 'semantic-ui-react'
+import { List, Icon } from 'semantic-ui-react'
 import moment from 'moment'
 
 import ToDoList from 'component/TaskList'
 
 let id;
 
-export default function PropertyDetail({ match }) {
+export default function PropertyDetail({ match, history }) {
   id = match.params.id;
   return (
     <div className="detail-container">
+      <div onClick={() => history.goBack()}>
+        <Icon
+          name="arrow left"
+          size="big"
+          className="back-button"
+          style={{ paddingLeft: 30 }} 
+        />  
+      </div>
       <div className="grid-container">
         <div className="property-info-container">
           <PropertyInfo />

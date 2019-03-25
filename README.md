@@ -1,6 +1,4 @@
-# Project Title
-
-CS 3200 Smart Manage System
+# CS 3200 Smart Manage System
 
 ## Getting Started
 

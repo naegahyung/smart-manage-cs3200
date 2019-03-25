@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { Card, Button, Input, List, Form, Checkbox, Feed, Icon } from 'semantic-ui-react'
 import moment from 'moment'
 
-export default function Home() {
+export default function Home({ history }) {
+  function navigateToDetail(id) {
+    history.push(`/property/${id}`)
+  }
+
   return (
     <div className="grid-container">
       <div className="grid-portfolio-container">
         <div className="portfolio">
-          <Portfolio />
+          <Portfolio navigateToDetail={navigateToDetail} />
         </div>
       </div>
       <div className="grid-task-list-container">
@@ -55,7 +59,7 @@ function generateDumbData(count, timestamp) {
 }
 
 
-function Portfolio() {
+function Portfolio({ navigateToDetail }) {
   const [loPortfolio, setLoPortfolio] = useState([])
 
   function fetchPortfolios() {
@@ -80,7 +84,9 @@ function Portfolio() {
     return (
       <Card
         key={`portfolio_element_${header}_${i}`}
+        className="portfolio-card"
         fluid
+        onClick={() => navigateToDetail(i)}
         header={header}
         meta={`${meta}_${timestamp}`}
         description={description}

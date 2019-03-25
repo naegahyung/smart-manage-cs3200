@@ -1,33 +1,57 @@
-.App {
-  text-align: center;
+.login-outer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -90%);
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+.login-form {
+  width: 300px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.login-header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-bottom: 40px;
 }
 
-.App-link {
-  color: #61dafb;
+.login-button {
+  left: 100%;
+  transform: translate(-100%);
+  position: relative;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-gap: 10px;
+  height: 100vh;
+  padding: 50px;
+}
+
+.grid-portfolio-container{
+  grid-column: 1;
+  grid-row: auto;
+}
+
+.grid-task-list-container {
+  grid-column: 2;
+  grid-row: auto;
+}
+
+.border {
+  border-color: black;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.portfolio {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.to-do {
+  padding: 20px;
+  padding-top: 0px;
 }

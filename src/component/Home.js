@@ -71,7 +71,7 @@ function Portfolio({ navigateToDetail }) {
         key={`portfolio_element_${property.id}_${i}`}
         className={`portfolio-card ${color} cursor-pointer`}
         fluid
-        onClick={() => navigateToDetail(i)}
+        onClick={() => navigateToDetail(property.id)}
         header={address}
         description={`${property.rooms} BED ${property.bathrooms} BATH ${property_type}`}
         meta={property.status}
@@ -111,7 +111,6 @@ function Update() {
 
   async function fetchFeeds() {
     const response = await getAllUpdates()
-    console.log(response)
     setFeeds(response)
   }
 
@@ -147,7 +146,7 @@ function Update() {
 
   return (
     <div>
-      <h1>Recently Updated</h1>
+      <h1>Updates</h1>
       <Feed>
         {formattedFeed}
       </Feed>

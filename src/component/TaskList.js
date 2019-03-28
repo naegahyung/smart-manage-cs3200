@@ -33,7 +33,6 @@ export default function ToDoList({ location }) {
   async function addData(taskValue, propertyId) {
     const data = await addTask(taskValue, propertyId)
     if (!data) return;
-    console.log(data)
     setLoTodo([ ...[data], ...loTodo ])
   }
 
@@ -88,7 +87,7 @@ function ToDoHeader({ toAddTask }) {
 
   return (
     <React.Fragment>
-      <h1>To Do</h1>
+      <h1>Tasks</h1>
       <Form onSubmit={onSubmit}>
         <Input
           icon='plus'

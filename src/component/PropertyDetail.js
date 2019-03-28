@@ -1,8 +1,10 @@
-import React from 'react'
-import { List, Icon } from 'semantic-ui-react'
-import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { List, Icon, Grid } from 'semantic-ui-react'
 
 import ToDoList from 'component/TaskList'
+import { 
+  getPropertyInfo
+} from 'utils/api'
 
 let id;
 
@@ -33,60 +35,78 @@ export default function PropertyDetail({ match, history, location }) {
 }
 
 function PropertyInfo() {
+  const [propertyInformation, setInformation] = useState({})
+
+  async function fetchInformation() {
+    const response = await getPropertyInfo(id)
+    console.log(formatDetails(response[0]))
+    setInformation(formatDetails(response[0]))
+  }
+
+  function formatDetails(o) {
+    const house = {}
+    const tenant = {}
+    const owner = {}
+    const address1 = `${o.street1} ${o[`street 2`]}`
+    const address2 = `${o.city}, ${o.state} ${o.zip}`
+    house.bathroom = o.bathrooms
+    house.room = o.rooms
+    house.status = o.status
+    house.propertyType = o.property_type
+    house.lastMaintenance = o.last_maintenance
+    house.lastVisited = o.last_visited
+    house.value = o.value
+    house.taxAmount = o.tax_amount
+    house.rentAmount = o.rent_amount 
+    house.rentDue = o.rent_due
+    house.totalSpending = o.total_spending
+
+    tenant.name = o.tenant_name
+    tenant.creditScore = o.creidt_score
+    tenant.lastPayment = o.last_rent_payment_date
+    tenant.contractDue = o.tenant_contract_due
+
+    owner.name = o.owner_name
+    owner.email = o.owner_email
+    owner.phone = o.owner_phone
+    return { house, tenant, owner, address1, address2 }
+  }
+
+  useEffect(() => {
+    fetchInformation()
+  }, [])
+
   return (
     <React.Fragment>
-      <h1>24975 Kit Carson Rd <br />
-        Hidden Hills, CA 91302
+      <h1>{propertyInformation.address1} <br />
+      {propertyInformation.address2}
       </h1>
-      <HouseDetail />
-      <TenantInfo />
-      <OwnerInfo />
+      <Grid columns={2}>
+        <HouseDetail data={propertyInformation.house} />
+        <Grid.Column>
+          <TenantInfo data={propertyInformation.tenant} />
+          <OwnerInfo data={propertyInformation.owner} />
+        </Grid.Column>
+      </Grid>
     </React.Fragment>
   )
 }
 
-function HouseDetail() {
-  const houseInfo = {
-    propertyType: 'Single Home Family',
-    lastMaintenance: moment().toISOString(),
-    lastVisited: moment().toISOString(),
-    appraisedValue: 2301200,
-    taxAmount: 10306,
-    rentAmount: 10600,
-    rentDue: moment().toISOString(),
-    totalSpending: 53000,
-    status: 'Occupied',
-  }
+function HouseDetail({ data }) {
 
-  return detailTemplate(houseInfo, 'Aboute House')
+  return detailTemplate(data, 'Aboute House')
 }
 
-function TenantInfo() {
-  const tenant = {  
-    name: 'Wilma S. Covey',
-    phone: '510-834-4115',
-    birthday: '11221949',
-    ssn: '60805XXXX',
-    creditScoreUponMoving: 770,
-    lastRentPaid: moment().toISOString(),
-    email: 'WilmaSCovey@dayrep.com',
-  }
-
-  return detailTemplate(tenant, 'About Tenant')
+function TenantInfo({ data }) {
+  return detailTemplate(data, 'About Tenant')
 }
+function OwnerInfo({ data }) {
 
-function OwnerInfo() {
-  const owner = {
-    name: 'Jin Kim',
-    phone: '123-456-7890',
-    email: 'admin@admin.com',
-    contractExpiration: moment().toISOString(),
-  }
-
-  return detailTemplate(owner, 'About Owner')
+  return detailTemplate(data, 'About Owner')
 }
 
 function detailTemplate(data, headerText) {
+  if (!data) return null
   const listOfDetails = Object.entries(data).map(([key, value]) => {
     return (
       <List.Item key={`${value}_${key}_${id}`}>
@@ -103,11 +123,11 @@ function detailTemplate(data, headerText) {
   })
 
   return (
-    <React.Fragment>
+    <Grid.Column style={{ marginBottom: 50 }}>
       <h3>{headerText}</h3>
       <List className="info-section">
         {listOfDetails}
       </List>
-    </React.Fragment>
+    </Grid.Column>
   )
 }

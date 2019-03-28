@@ -1,35 +1,60 @@
 import React, { useState, useEffect } from 'react'
-import { Input, List, Form, Checkbox } from 'semantic-ui-react'
+import { Input, List, Form, Button, Search } from 'semantic-ui-react'
+import moment from 'moment'
+import _ from 'lodash'
 
-import generateDumbData from 'utils/randomData'
+import {
+  getAllTasks,
+  deleteTaskById,
+  addTask,
+} from 'utils/api'
+import AdditionalInfoInput from 'component/AdditionalInfoInput'
 
-export default function ToDoList() {
+export default function ToDoList({ location }) {
   const [loTodo, setLoTodo] = useState([])
   const [taskValue, setTaskValue] = useState('')
 
-  useEffect(() => {
-    setLoTodo(generateDumbData(5))
-  }, [])
+  const isHome = location.pathname.includes('home')
 
-  function addData() {
-    setLoTodo(loTodo.concat([ { description: taskValue } ]))
+  async function fetchAllTasks() {
+    const result = await getAllTasks()
+    if (!result) setLoTodo([])
+    else setLoTodo(result);
   }
 
   useEffect(() => {
-    if (taskValue.length) {
-      addData();
-    }
-  }, [ taskValue ])
+    if (isHome) {
+      fetchAllTasks()
+    } else {
 
-  function deleteTask(i) {
-    const copy = loTodo.slice();
-    copy.splice(i, 1);
-    setLoTodo(copy)
+    }
+  }, [])
+
+  async function addData(taskValue, propertyId) {
+    const data = await addTask(taskValue, propertyId)
+    if (!data) return;
+    console.log(data)
+    setLoTodo([ ...[data], ...loTodo ])
+  }
+
+  async function deleteTask(id) {
+    const result = await deleteTaskById(id)
+    if (!result || result === 'fail') {
+      return;
+    }
+    removeItem(id)
+  }
+
+  function removeItem(id) {
+    const filtered = loTodo.filter(todo => todo.id !== id)
+    setLoTodo(filtered)
   }
 
   return (
     <div>
-      <ToDoHeader toAddTask={(value) => setTaskValue(value)} />
+      <ToDoHeader 
+        toAddTask={addData}
+      />
       <Task data={loTodo} deleteTask={deleteTask} />
     </div>
   )
@@ -37,29 +62,49 @@ export default function ToDoList() {
 
 function ToDoHeader({ toAddTask }) {
   const [taskInput, setTaskInput] = useState('');
-
+  const [isClicked, setIsClicked] = useState(false);
+  const [propertyId, setPropertyId] = useState('');
 
   const onChangeInput = (e) => {
     if (!e.target) return;
     setTaskInput(e.target.value);
   }
 
-  function clearInput() {
-    toAddTask(taskInput);
-    setTaskInput('');
+  const onPress = () => {
+    if (isClicked) return;
+    setIsClicked(true)
+  }
+
+  const onBlur = () => {
+    if (!isClicked) return;
+    setIsClicked(false)
+  }
+
+  function onSubmit() {
+    toAddTask(taskInput, propertyId);
+    setTaskInput('')
+    setPropertyId('')
+    setIsClicked(false)
   }
 
   return (
     <React.Fragment>
       <h1>To Do</h1>
-      <Form onSubmit={clearInput}>
+      <Form onSubmit={onSubmit}>
         <Input
           icon='plus'
           iconPosition='left'
           placeholder='Add Task'
           fluid
+          onClick={onPress}
           onChange={onChangeInput} 
           value={taskInput}
+        />
+        <AdditionalInfoInput 
+          isShown={isClicked} 
+          onPressCancel={onBlur} 
+          onPressSubmit={onSubmit}
+          onChangePropertyId={(value) => setPropertyId(value)}
         />
       </Form>
     </React.Fragment>
@@ -67,22 +112,28 @@ function ToDoHeader({ toAddTask }) {
 }
 
 function Task({ data, deleteTask }) {
-  const content = data.map(({ description, index }, i) => {
+  const content = data.map(({ body, id, updated, property_id }, i) => {
     return (
-      <List.Content>
-        <List.Description>
-          <Checkbox
-            radio
-            onClick={() => deleteTask(i)}
-            checked={false}
-          />
-          {`${description}_${index}`}
-        </List.Description>
-      </List.Content>
+      <List.Item key={`task_home_${id}`}>
+        <List.Icon 
+          onClick={() => deleteTask(id)}
+          className="cursor-pointer" 
+          name='circle outline' 
+          size='large' 
+          verticalAlign='middle' 
+        />
+        <List.Content style={{ maxWidth: 0 }}>
+          <List.Header style={{ overflowWrap: 'break-word' }}>{`${body}`}</List.Header>
+          {property_id && property_id !== 'None' && <label>{property_id}</label>}
+          <List.Description>
+          {`updated ${moment(updated).fromNow()}`}
+          </List.Description>
+        </List.Content>
+      </List.Item>
     )
   })
   return (
-    <List>
+    <List divided relaxed>
       {content}
     </List>
   ) 

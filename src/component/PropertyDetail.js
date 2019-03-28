@@ -6,7 +6,7 @@ import ToDoList from 'component/TaskList'
 
 let id;
 
-export default function PropertyDetail({ match, history }) {
+export default function PropertyDetail({ match, history, location }) {
   id = match.params.id;
   return (
     <div className="detail-container">
@@ -24,7 +24,7 @@ export default function PropertyDetail({ match, history }) {
         </div>
         <div className="grid-task-list-container">
           <div className="to-do">
-            <ToDoList />
+            <ToDoList location={location} />
           </div>
         </div>
       </div>

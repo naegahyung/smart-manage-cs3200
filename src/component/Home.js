@@ -4,9 +4,11 @@ import moment from 'moment'
 
 import generateDumbData from 'utils/randomData'
 import ToDoList from 'component/TaskList'
-import { getAllPortfoliosForUser } from 'utils/api'
+import {
+  getAllPortfolios,
+} from 'utils/api'
 
-export default function Home({ history }) {
+export default function Home({ history, location }) {
   function navigateToDetail(id) {
     history.push(`/property/${id}`)
   }
@@ -20,7 +22,7 @@ export default function Home({ history }) {
       </div>
       <div className="grid-task-list-container">
         <div className="to-do">
-          <ToDoList />
+          <ToDoList location={location} />
         </div>
         <div className="last-updated-list"> 
           <Update />
@@ -34,8 +36,9 @@ function Portfolio({ navigateToDetail }) {
   const [loPortfolio, setLoPortfolio] = useState([])
 
   async function fetchPortfolios() {
-    const result = await getAllPortfoliosForUser()
-    setLoPortfolio(result);
+    const result = await getAllPortfolios()
+    if (!result) setLoPortfolio([])
+    else setLoPortfolio(result);
   }
 
   function addToListing() {
@@ -64,7 +67,7 @@ function Portfolio({ navigateToDetail }) {
     return (
       <Card
         key={`portfolio_element_${property.id}_${i}`}
-        className={`portfolio-card ${color}`}
+        className={`portfolio-card ${color} cursor-pointer`}
         fluid
         onClick={() => navigateToDetail(i)}
         header={address}

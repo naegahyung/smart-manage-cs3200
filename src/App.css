@@ -35,8 +35,16 @@
   grid-row: auto;
 }
 
-.portfolio-card {
+.portfolio-card.green-card {
   cursor: pointer;
+  box-shadow: '0 0 0 1px #d4d4d5, 0 0 5px 0 #21ba45, 0 1px 3px 0 #d4d4d5' !important;
+  -webkit-box-shadow: 0 0 0 1px #d4d4d5, 0 0 5px 0 #21ba45, 0 1px 3px 0 #d4d4d5 !important;
+}
+
+.portfolio-card.red-card {
+  cursor: pointer;
+  box-shadow: '0 0 0 1px #d4d4d5, 0 0 5px 0 #db2828, 0 1px 3px 0 #d4d4d5' !important;
+  -webkit-box-shadow: 0 0 0 1px #d4d4d5, 0 0 5px 0 #db2828, 0 1px 3px 0 #d4d4d5 !important; 
 }
 
 .grid-task-list-container {

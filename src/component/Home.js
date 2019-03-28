@@ -4,6 +4,7 @@ import moment from 'moment'
 
 import generateDumbData from 'utils/randomData'
 import ToDoList from 'component/TaskList'
+import { getAllPortfoliosForUser } from 'utils/api'
 
 export default function Home({ history }) {
   function navigateToDetail(id) {
@@ -32,8 +33,9 @@ export default function Home({ history }) {
 function Portfolio({ navigateToDetail }) {
   const [loPortfolio, setLoPortfolio] = useState([])
 
-  function fetchPortfolios() {
-    setLoPortfolio(generateDumbData(20));
+  async function fetchPortfolios() {
+    const result = await getAllPortfoliosForUser()
+    setLoPortfolio(result);
   }
 
   function addToListing() {
@@ -50,16 +52,25 @@ function Portfolio({ navigateToDetail }) {
     return 0;
   })
 
-  const cards = sorted.map(({ header, meta, description, timestamp }, i) => {
+  const cards = sorted.map((property, i) => {
+    const address = `${property.street1} ${property['street 2']} ${property.city} ${property.state} ${property.zip}`
+    let { property_type, status } = property;
+    if (property_type === 'SFH') property_type = 'Single-Family'
+    else if (property_type === 'MFH') property_type = 'Multi-Family'
+    else property_type = 'Condo'
+
+    const color = status === 'OCCUPIED' ? 'green-card' : 'red-card'
+
     return (
       <Card
-        key={`portfolio_element_${header}_${i}`}
-        className="portfolio-card"
+        key={`portfolio_element_${property.id}_${i}`}
+        className={`portfolio-card ${color}`}
         fluid
+        style={{ }}
         onClick={() => navigateToDetail(i)}
-        header={header}
-        meta={`${meta}_${timestamp}`}
-        description={description}
+        header={address}
+        description={`${property.rooms} BED ${property.bathrooms} BATH ${property_type}`}
+        meta={property.status}
       />
     )
   })

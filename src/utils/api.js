@@ -31,6 +31,10 @@ export function fetchAddress(body) {
     });
 }
 
+export function getAllUpdates() {
+    return _call_api('/api/news?limit=10', 'get')
+}
+
 async function _call_api(url, method, data) {
     let response;
     if (method === 'get') {

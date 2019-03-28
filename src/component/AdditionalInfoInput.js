@@ -35,19 +35,24 @@ export class AdditionalInfoInput extends Component {
     this.debounceFetch()
   } 
 
+  submit = () => {
+    this.props.onPressSubmit()
+    this.setState({ addressInput: '' })
+  }
+
   onPropertySelect = (e, { result }) => {
     this.setState({ selectedPropertyId: result.id, addressInput: result.title  })
     this.props.onChangePropertyId(result.id)
   }
 
   render() {
-    const { isShown, onPressCancel, onPressSubmit } = this.props;
+    const { isShown, onPressCancel } = this.props;
     const { isLoading, addresses, addressInput } = this.state;
     if (!isShown) return null
 
     return (
       <div className="task-input-buttons-container"> 
-        <Button color="green" type='submit' onClick={onPressSubmit}>Submit</Button>
+        <Button color="green" type='submit' onClick={this.submit}>Submit</Button>
         <Button color="red" type='reset' onClick={onPressCancel}>Cancel</Button>
         <div className="task-input-address">
           <label>Link property: &nbsp; </label>

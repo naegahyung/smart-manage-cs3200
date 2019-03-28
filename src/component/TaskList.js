@@ -84,7 +84,6 @@ function ToDoHeader({ toAddTask }) {
     toAddTask(taskInput, propertyId);
     setTaskInput('')
     setPropertyId('')
-    setIsClicked(false)
   }
 
   return (
@@ -112,21 +111,23 @@ function ToDoHeader({ toAddTask }) {
 }
 
 function Task({ data, deleteTask }) {
-  const content = data.map(({ body, id, updated, property_id }, i) => {
+  const content = data.map(({ body, id, updated, full_address }, i) => {
     return (
-      <List.Item key={`task_home_${id}`}>
+      <List.Item key={`task_home_${id}`} className="task-list-item">
         <List.Icon 
           onClick={() => deleteTask(id)}
-          className="cursor-pointer" 
+          style={{ paddingLeft: 10 }}
+          className="cursor-pointer"
           name='circle outline' 
           size='large' 
           verticalAlign='middle' 
         />
         <List.Content style={{ maxWidth: 0 }}>
           <List.Header style={{ overflowWrap: 'break-word' }}>{`${body}`}</List.Header>
-          {property_id && property_id !== 'None' && <label>{property_id}</label>}
-          <List.Description>
+          <br />
           {`updated ${moment(updated).fromNow()}`}
+          <List.Description>
+          {full_address && full_address !== 'None' && <label>For {full_address}</label>}
           </List.Description>
         </List.Content>
       </List.Item>

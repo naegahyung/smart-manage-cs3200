@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Button, Feed, Icon } from 'semantic-ui-react'
+import { Card, Button, Feed, Icon, Modal } from 'semantic-ui-react'
 import moment from 'moment'
 
 import generateDumbData from 'utils/randomData'
 import ToDoList from 'component/TaskList'
+import AddPropertyScreen from 'component/AddPropertyScreen'
 import {
   getAllPortfolios,
+  getAllUpdates
 } from 'utils/api'
 
 export default function Home({ history, location }) {
@@ -81,6 +83,7 @@ function Portfolio({ navigateToDetail }) {
     <div>
       <Header add={addToListing} />
       {cards}
+      <AddPropertyScreen />
     </div>
   )
 }
@@ -89,12 +92,16 @@ function Header({ add }) {
   return (
     <div>
       <h1>Property Portfolio for Admin</h1>
-      <Button 
-        positive
-        onClick={add}
+      <Modal trigger={<Button 
+          positive
+          onClick={add}
+        >
+          Add a property
+        </Button>}
       >
-        Add a property
-      </Button>
+        <AddPropertyScreen />
+      </Modal>
+        
     </div>
   )
 }
@@ -102,27 +109,37 @@ function Header({ add }) {
 function Update() {
   const [feeds, setFeeds] = useState([])
 
+  async function fetchFeeds() {
+    const response = await getAllUpdates()
+    console.log(response)
+    setFeeds(response)
+  }
+
   useEffect(() => {
-    setFeeds(generateDumbData(10))
+    fetchFeeds()
   }, [])
 
-  const formattedFeed = feeds.map(feed => {
+  const formattedFeed = feeds.map((feed) => {
+    const { due, field, label } = feed;
+    const address = `${feed.street1} ${feed['street 2']} ${feed.city}, ${feed.state} ${feed.zip}`
+    let reason = ''
+    if (field === "last_visited") {
+      reason = 'made a visit to the property on'
+    } else if (field === 'rent_due') {
+      reason = 'rent is due on' 
+    } else if (field === 'last_maintenance') {
+      reason = 'maintenance occurred on'
+    }
     return (
       <Feed.Event>
-        <Feed.Label>
-          <img src='https://react.semantic-ui.com/images/avatar/small/elliot.jpg' />
-        </Feed.Label>
         <Feed.Content>
           <Feed.Summary>
-            <Feed.User>Elliot Fu</Feed.User> added you as a friend
-            <Feed.Date>1 Hour Ago</Feed.Date>
+            For {address}, {reason}
           </Feed.Summary>
-          <Feed.Meta>
-            <Feed.Like>
-              <Icon name='like' />
-              4 Likes
-            </Feed.Like>
-          </Feed.Meta>
+            <Feed.Meta>
+              <Feed.Date>{moment(due).fromNow()}</Feed.Date>
+              {label}
+            </Feed.Meta>
         </Feed.Content>
       </Feed.Event>
     )

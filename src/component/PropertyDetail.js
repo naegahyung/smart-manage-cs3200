@@ -39,7 +39,6 @@ function PropertyInfo() {
 
   async function fetchInformation() {
     const response = await getPropertyInfo(id)
-    console.log(formatDetails(response[0]))
     setInformation(formatDetails(response[0]))
   }
 

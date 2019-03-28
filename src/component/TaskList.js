@@ -7,6 +7,7 @@ import {
   getAllTasks,
   deleteTaskById,
   addTask,
+  getTasksForProperty
 } from 'utils/api'
 import AdditionalInfoInput from 'component/AdditionalInfoInput'
 
@@ -22,16 +23,27 @@ export default function ToDoList({ location }) {
     else setLoTodo(result);
   }
 
+  async function fetchTasksForProperty(id) {
+    const result = await getTasksForProperty(id)
+    if (!result) setLoTodo([])
+    else setLoTodo(result)
+  }
+
   useEffect(() => {
     if (isHome) {
       fetchAllTasks()
     } else {
-
+      const propertyId = location.pathname.split('/')[2]
+      fetchTasksForProperty(propertyId)
     }
   }, [])
 
   async function addData(taskValue, propertyId) {
-    const data = await addTask(taskValue, propertyId)
+    let id = propertyId
+    if (!propertyId || propertyId.length === 0) {
+      id = location.pathname.split('/')[2]
+    }
+    const data = await addTask(taskValue, id)
     if (!data) return;
     setLoTodo([ ...[data], ...loTodo ])
   }
@@ -53,13 +65,14 @@ export default function ToDoList({ location }) {
     <div>
       <ToDoHeader 
         toAddTask={addData}
+        isHome={isHome}
       />
       <Task data={loTodo} deleteTask={deleteTask} />
     </div>
   )
 }
 
-function ToDoHeader({ toAddTask }) {
+function ToDoHeader({ toAddTask, isHome }) {
   const [taskInput, setTaskInput] = useState('');
   const [isClicked, setIsClicked] = useState(false);
   const [propertyId, setPropertyId] = useState('');
@@ -98,12 +111,14 @@ function ToDoHeader({ toAddTask }) {
           onChange={onChangeInput} 
           value={taskInput}
         />
-        <AdditionalInfoInput 
-          isShown={isClicked} 
-          onPressCancel={onBlur} 
-          onPressSubmit={onSubmit}
-          onChangePropertyId={(value) => setPropertyId(value)}
-        />
+        { isHome && 
+          <AdditionalInfoInput 
+            isShown={isClicked} 
+            onPressCancel={onBlur} 
+            onPressSubmit={onSubmit}
+            onChangePropertyId={(value) => setPropertyId(value)}
+          />
+        }
       </Form>
     </React.Fragment>
   )

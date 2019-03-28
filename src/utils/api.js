@@ -39,6 +39,10 @@ export function getPropertyInfo(id) {
     return _call_api(`/api/property/${id}`, 'get')
 }
 
+export function getTasksForProperty(id) {
+    return _call_api(`/api/tasks/${id}`, 'get')
+}
+
 async function _call_api(url, method, data) {
     let response;
     if (method === 'get') {

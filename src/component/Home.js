@@ -66,7 +66,6 @@ function Portfolio({ navigateToDetail }) {
         key={`portfolio_element_${property.id}_${i}`}
         className={`portfolio-card ${color}`}
         fluid
-        style={{ }}
         onClick={() => navigateToDetail(i)}
         header={address}
         description={`${property.rooms} BED ${property.bathrooms} BATH ${property_type}`}

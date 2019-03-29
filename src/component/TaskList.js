@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { Input, List, Form, Button, Search } from 'semantic-ui-react'
 import moment from 'moment'
-import _ from 'lodash'
 
 import {
   getAllTasks,
   deleteTaskById,
   addTask,
-  getTasksForProperty
+  getTasksForProperty,
+  updateTaskApi
 } from 'utils/api'
 import AdditionalInfoInput from 'component/AdditionalInfoInput'
 
 export default function ToDoList({ location }) {
   const [loTodo, setLoTodo] = useState([])
-  const [taskValue, setTaskValue] = useState('')
 
   const isHome = location.pathname.includes('home')
 
@@ -61,13 +60,33 @@ export default function ToDoList({ location }) {
     setLoTodo(filtered)
   }
 
+  function updateTask(info) {
+    const { id, body, updated } = info
+    const updatedList = loTodo.map(todo => {
+      if (todo.id === id) {
+        let update = {
+          ...todo,
+          body,
+          updated
+        }
+        return update;
+      }
+      return todo;
+    })
+    setLoTodo(updatedList)
+  }
+
   return (
     <div>
       <ToDoHeader 
         toAddTask={addData}
         isHome={isHome}
       />
-      <Task data={loTodo} deleteTask={deleteTask} />
+      <Task 
+        data={loTodo} 
+        deleteTask={deleteTask}
+        updateTask={(info) => updateTask(info)} 
+      />
     </div>
   )
 }
@@ -124,7 +143,36 @@ function ToDoHeader({ toAddTask, isHome }) {
   )
 }
 
-function Task({ data, deleteTask }) {
+function Task({ data, deleteTask, updateTask }) {
+  const [editing, flipEditing] = useState(false)
+  const [editId, changeEditTarget] = useState('')
+  const [field, changeField] = useState('')
+
+  function turnOnEdit(id, body) {
+    flipEditing(true)
+    changeEditTarget(id)
+    changeField(body)
+  }
+
+  const onChangeField = e => {
+    if (!e.target) return
+    const { value } = e.target
+    changeField(value)
+  }
+
+  const onSubmit = async () => {
+    const response = await updateTaskApi(editId, field);
+    resetValues()
+    console.log(response)
+    updateTask(response)
+  }
+
+  function resetValues() {
+    changeField('')
+    changeEditTarget('')
+    flipEditing(false)
+  }
+
   const content = data.map(({ body, id, updated, full_address }, i) => {
     return (
       <List.Item key={`task_home_${id}`} className="task-list-item">
@@ -137,7 +185,24 @@ function Task({ data, deleteTask }) {
           verticalAlign='middle' 
         />
         <List.Content style={{ maxWidth: 0 }}>
-          <List.Header style={{ overflowWrap: 'break-word' }}>{`${body}`}</List.Header>
+          <List.Header
+            className="cursor-text"
+            onClick={() => turnOnEdit(id, body)}
+            style={{ overflowWrap: 'break-word' }}
+          >
+            { editing && editId === id ?
+              <Form onSubmit={onSubmit}>
+                <Input 
+                  autoFocus
+                  value={field}
+                  fluid
+                  onChange={onChangeField}
+                  onBlur={resetValues}
+                />
+              </Form> :
+              `${body}`
+            }
+          </List.Header>
           <br />
           {`updated ${moment(updated).fromNow()}`}
           <List.Description>

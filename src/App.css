@@ -39,6 +39,10 @@
   cursor: pointer;
 }
 
+.cursor-text {
+  cursor: text;
+}
+
 .portfolio-card.green-card.cursor-pointer {
   box-shadow: 0 0 0 1px #d4d4d5, -5px 0 0 0.5px #21ba45, 0 1px 3px 0 #d4d4d5 !important;
   -webkit-box-shadow: 0 0 0 1px #d4d4d5, -5px 0 0 0.5px #21ba45, 0 1px 3px 0 #d4d4d5;

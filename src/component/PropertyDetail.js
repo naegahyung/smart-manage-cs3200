@@ -22,7 +22,7 @@ export default function PropertyDetail({ match, history, location }) {
       </div>
       <div className="grid-container">
         <div className="property-info-container">
-          <PropertyInfo />
+          <PropertyInfo goBack={() => history.push('/home')} />
         </div>
         <div className="grid-task-list-container">
           <div className="to-do">
@@ -34,12 +34,13 @@ export default function PropertyDetail({ match, history, location }) {
   )
 }
 
-function PropertyInfo() {
+function PropertyInfo({ goBack }) {
   const [propertyInformation, setInformation] = useState({})
 
   async function fetchInformation() {
     const response = await getPropertyInfo(id)
-    setInformation(formatDetails(response[0]))
+    if (!response || !response.length) goBack();
+    else setInformation(formatDetails(response[0]))
   }
 
   function formatDetails(o) {

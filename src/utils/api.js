@@ -44,7 +44,15 @@ export function getTasksForProperty(id) {
 }
 
 export function updateTaskApi(id, body) {
-    return _call_api('api/task', 'patch', { id, body })
+    return _call_api('/api/task', 'patch', { id, body })
+}
+
+export function addProperty(body) {
+    return _call_api('/api/property', 'post', body)
+}
+
+export function deleteProperty(id) {
+    return _call_api('/api/property', 'delete', { propertyId: id })
 }
 
 async function _call_api(url, method, data) {

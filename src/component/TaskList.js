@@ -163,7 +163,6 @@ function Task({ data, deleteTask, updateTask }) {
   const onSubmit = async () => {
     const response = await updateTaskApi(editId, field);
     resetValues()
-    console.log(response)
     updateTask(response)
   }
 

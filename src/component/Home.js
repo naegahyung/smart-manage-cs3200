@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Button, Feed, Icon, Modal } from 'semantic-ui-react'
+import { Card, Button, Feed, Icon, Modal, Confirm } from 'semantic-ui-react'
 import moment from 'moment'
 
-import generateDumbData from 'utils/randomData'
 import ToDoList from 'component/TaskList'
 import AddPropertyScreen from 'component/AddPropertyScreen'
 import {
   getAllPortfolios,
-  getAllUpdates
+  getAllUpdates,
+  deleteProperty
 } from 'utils/api'
 
 export default function Home({ history, location }) {
@@ -36,16 +36,30 @@ export default function Home({ history, location }) {
 
 function Portfolio({ navigateToDetail }) {
   const [loPortfolio, setLoPortfolio] = useState([])
-
+  const [showPrompt, setShowPrompt] = useState(false)
+  const [deleteId, setDeleteId] = useState('')
+  
   async function fetchPortfolios() {
     const result = await getAllPortfolios()
-    if (!result) setLoPortfolio([])
+    if (!result) setLoPortfolio([]);
     else setLoPortfolio(result);
   }
 
-  function addToListing() {
-    setLoPortfolio(loPortfolio.concat(generateDumbData(1, moment())));
+  const addToListing = (data) => {
+    setLoPortfolio([ data, ...loPortfolio ]);
   } 
+
+  const showDeletePrompt = (id) => {
+    setShowPrompt(true);
+    setDeleteId(id);
+  }
+
+  const deleteListing = async () => {
+    const { propertyId } = await deleteProperty(deleteId)
+    setDeleteId('');
+    setLoPortfolio(loPortfolio.filter(p => p.id !== propertyId));
+    setShowPrompt(false);
+  }
   
   useEffect(() => {
     fetchPortfolios();
@@ -71,11 +85,27 @@ function Portfolio({ navigateToDetail }) {
         key={`portfolio_element_${property.id}_${i}`}
         className={`portfolio-card ${color} cursor-pointer`}
         fluid
-        onClick={() => navigateToDetail(property.id)}
-        header={address}
-        description={`${property.rooms} BED ${property.bathrooms} BATH ${property_type}`}
-        meta={property.status}
-      />
+      >
+        <Card.Content>
+          <Card.Header>{address}</Card.Header>
+            <Icon
+              className="cursor-pointer"
+              name="trash alternate"
+              size="large"
+              color="red"
+              style={{ position: 'absolute', right: 10, top: 10 }}
+              onClick={() => showDeletePrompt(property.id)}
+            />
+        </Card.Content>
+        <Card.Content 
+          onClick={() => navigateToDetail(property.id)}
+        >
+          <Card.Meta>{property.status}</Card.Meta>
+          <Card.Description>
+            {`${property.rooms} BED ${property.bathrooms} BATH ${property_type}`}
+          </Card.Description>
+        </Card.Content>
+      </Card>
     )
   })
 
@@ -83,23 +113,40 @@ function Portfolio({ navigateToDetail }) {
     <div>
       <Header add={addToListing} />
       {cards}
-      <AddPropertyScreen />
+      <div>
+        <Confirm 
+          open={showPrompt} 
+          onCancel={() => setShowPrompt(false)} 
+          header='Deleting Property'
+          content='Deleting property is an irreversible action. By confirming, you will be deleting all information, including tenant, tasks, and owner.'
+          onConfirm={deleteListing} />
+      </div>
     </div>
   )
 }
 
 function Header({ add }) {
+  const [isModalOpen, setModalOpen] = useState(false)
+
+  function closeModal() {
+    setModalOpen(false);
+  }
+
   return (
     <div>
       <h1>Property Portfolio for Admin</h1>
       <Modal trigger={<Button 
           positive
-          onClick={add}
+          onClick={() => setModalOpen(true)}
         >
           Add a property
         </Button>}
+        open={isModalOpen}
       >
-        <AddPropertyScreen />
+        <AddPropertyScreen 
+          close={closeModal}
+          addProperty={add} 
+        />
       </Modal>
         
     </div>
@@ -135,10 +182,10 @@ function Update() {
           <Feed.Summary>
             For {address}, {reason}
           </Feed.Summary>
-            <Feed.Meta>
-              <Feed.Date>{moment(due).fromNow()}</Feed.Date>
-              {label}
-            </Feed.Meta>
+          <Feed.Meta>
+            <Feed.Date>{moment(due).fromNow()}</Feed.Date>
+            {label}
+          </Feed.Meta>
         </Feed.Content>
       </Feed.Event>
     )

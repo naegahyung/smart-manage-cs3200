@@ -35,7 +35,8 @@ export class AdditionalInfoInput extends Component {
     this.debounceFetch()
   } 
 
-  submit = () => {
+  submit = (e) => {
+    e.preventDefault();
     this.props.onPressSubmit()
     this.setState({ addressInput: '' })
   }

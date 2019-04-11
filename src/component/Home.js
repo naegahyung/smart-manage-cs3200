@@ -24,7 +24,7 @@ export default function Home({ history, location }) {
       </div>
       <div className="grid-task-list-container">
         <div className="to-do">
-          <ToDoList location={location} />
+          <ToDoList location={location}  />
         </div>
         <div className="last-updated-list"> 
           <Update />
@@ -59,6 +59,7 @@ function Portfolio({ navigateToDetail }) {
     setDeleteId('');
     setLoPortfolio(loPortfolio.filter(p => p.id !== propertyId));
     setShowPrompt(false);
+    document.location.reload();
   }
   
   useEffect(() => {

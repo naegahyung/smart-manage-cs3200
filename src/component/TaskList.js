@@ -15,7 +15,6 @@ export default function ToDoList({ location }) {
   const [loTodo, setLoTodo] = useState([])
 
   const isHome = location.pathname.includes('home')
-
   async function fetchAllTasks() {
     const result = await getAllTasks()
     if (!result) setLoTodo([])

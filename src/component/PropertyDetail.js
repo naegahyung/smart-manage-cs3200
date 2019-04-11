@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { List, Icon, Grid } from 'semantic-ui-react'
+import { List, Icon, Grid, Input, Form } from 'semantic-ui-react'
 
 import ToDoList from 'component/TaskList'
 import { 
-  getPropertyInfo
+  getPropertyInfo,
+  modifyStatusOfProperty,
+  modifyPropertyField
 } from 'utils/api'
 
 let id;
@@ -61,12 +63,12 @@ function PropertyInfo({ goBack }) {
     house.rentDue = o.rent_due
     house.totalSpending = o.total_spending
 
-    tenant.name = o.tenant_name
-    tenant.creditScore = o.creidt_score
+    tenant.tenantName = o.tenant_name
+    tenant.creditScore = o.credit_score
     tenant.lastPayment = o.last_rent_payment_date
     tenant.contractDue = o.tenant_contract_due
 
-    owner.name = o.owner_name
+    owner.ownerName = o.owner_name
     owner.email = o.owner_email
     owner.phone = o.owner_phone
     return { house, tenant, owner, address1, address2 }
@@ -76,47 +78,110 @@ function PropertyInfo({ goBack }) {
     fetchInformation()
   }, [])
 
+  const modifyData = (table, field, value) => {
+    setInformation({ ...propertyInformation, [table]: { ...propertyInformation[table], [field]: value }})
+  }
+
   return (
     <React.Fragment>
       <h1>{propertyInformation.address1} <br />
       {propertyInformation.address2}
       </h1>
       <Grid columns={2}>
-        <HouseDetail data={propertyInformation.house} />
+        <HouseDetail data={propertyInformation.house} modifyData={modifyData} />
         <Grid.Column>
-          <TenantInfo data={propertyInformation.tenant} />
-          <OwnerInfo data={propertyInformation.owner} />
+          <TenantInfo data={propertyInformation.tenant} modifyData={modifyData} />
+          <OwnerInfo data={propertyInformation.owner} modifyData={modifyData} />
         </Grid.Column>
       </Grid>
     </React.Fragment>
   )
 }
 
-function HouseDetail({ data }) {
-
-  return detailTemplate(data, 'Aboute House')
+function HouseDetail({ data, modifyData }) {
+  return detailTemplate(data, 'About House', modifyData)
 }
 
-function TenantInfo({ data }) {
-  return detailTemplate(data, 'About Tenant')
+function TenantInfo({ data, modifyData}) {
+  return detailTemplate(data, 'About Tenant', modifyData)
 }
-function OwnerInfo({ data }) {
+function OwnerInfo({ data, modifyData}) {
 
-  return detailTemplate(data, 'About Owner')
+  return detailTemplate(data, 'About Owner', modifyData)
 }
 
-function detailTemplate(data, headerText) {
+function detailTemplate(data, headerText, modifyData) {
   if (!data) return null
+  const [modifyField, changeModifyField] = useState('')
+  const [isModifyState, changeModifyState] = useState(false)
+  const [modifiedValue, changeValue] = useState('')
+
+  const onClickField = (key, value) => {
+    changeModifyField(key);
+    changeModifyState(true);
+    changeValue(value)
+  }
+
+  const resetValues = () => {
+    changeModifyField('')
+    changeModifyState(false)
+    changeValue('')
+  }
+
+  const changeStatus = async (val) => {
+    await modifyStatusOfProperty(val, id);
+    changeValue(val)
+    modifyData('house', 'status', val)
+  }
+
+  const onSubmit = async () => {
+    await modifyPropertyField(headerText.replace('About ', ''), modifyField, modifiedValue, id);
+    resetValues();
+    modifyData(headerText.replace('About ', '').toLowerCase(), modifyField, modifiedValue)
+  }
+  const InputFieldVariation = (key) => {
+    const set = new Set()
+    set.add('lastMaintenance')
+    set.add('lastVisited')
+    set.add('lastPayment')
+    set.add('contractDue')
+    set.add('rentDue')
+    if (set.has(key)) return "date"
+    return "text"
+  }
+
   const listOfDetails = Object.entries(data).map(([key, value]) => {
+    const rejected = key === 'propertyType'
     return (
       <List.Item key={`${value}_${key}_${id}`}>
         <List.Content>
           <List.Header>
             <h2>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z]+)/g, ' $1')}</h2>
           </List.Header>
-          <List.Description>
-            {value}
-          </List.Description>
+          { isModifyState && key === modifyField && !rejected ? 
+            <Form onSubmit={onSubmit}>
+              { key === 'status' ? 
+                <Form.Radio
+                  checked={modifiedValue === 'OCCUPIED'}
+                  value="status"
+                  toggle
+                  style={{ zIndex: 999 }}
+                  onChange={(e) => changeStatus(modifiedValue === 'OCCUPIED' ? 'VACANT' : 'OCCUPIED')}
+                /> :
+                <Input 
+                  type={InputFieldVariation(key)}
+                  autoFocus
+                  value={modifiedValue}
+                  fluid
+                  onChange={(e) => changeValue(e.target.value)}
+                  onBlur={resetValues} 
+                />
+              } 
+            </Form> :
+            <List.Description onClick={() => onClickField(key, value)}>
+              {value}
+            </List.Description>
+          }
         </List.Content>
       </List.Item>
     )

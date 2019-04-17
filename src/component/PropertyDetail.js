@@ -135,8 +135,9 @@ function detailTemplate(data, headerText, modifyData) {
   }
 
   const onSubmit = async () => {
-    await modifyPropertyField(headerText.replace('About ', ''), modifyField, modifiedValue, id);
+    const response = await modifyPropertyField(headerText.replace('About ', ''), modifyField, modifiedValue, id);
     resetValues();
+    if (!response) return;
     modifyData(headerText.replace('About ', '').toLowerCase(), modifyField, modifiedValue)
   }
   const InputFieldVariation = (key) => {

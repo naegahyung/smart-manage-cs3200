@@ -2,7 +2,7 @@
   "name": "cs3200-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": "https://tranquil-plateau-28979.herokuapp.com",
   "dependencies": {
     "axios": "^0.18.0",
     "lodash": "^4.17.11",

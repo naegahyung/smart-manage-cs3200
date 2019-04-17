@@ -19,14 +19,10 @@ A step by step series of examples that tell you how to get a development env run
 
 
 ```
-git clone `this project`
+git clone https://github.com/naegahyung/smart-manage-cs3200.git
+cd smart-manage-cs3200
 yarn install
 ```
-
-## Running the tests
-
-No tests are added for this project due to time constraint.
-
 
 ### Starting the development
 
